@@ -13,10 +13,10 @@ let y=true;
         }
     });
 
-    for (let _i = 0; _i < 1; _i++) {
+    for (let _i = 2; _i < 3; _i++) {
         for (let _j = 0; _j < 22; _j++) {
             if(x){
-                _j=19; x=false;
+                _j=11; x=false;
             }
             for (let _k = 0; _k < 5; _k++) {
                 if(y){
@@ -24,7 +24,7 @@ let y=true;
                 }
                 for (let _p = 0; _p < 20; _p++) {
                     if(z){
-                        _p=6; z=false;
+                        _p=8; z=false;
                     }
                     const page = await browser.newPage();
                     page.on('console', msg => {
@@ -33,7 +33,7 @@ let y=true;
                             const value = await arg.jsonValue();
                             //console.log(value);
                             try {
-                                fs.appendFile('output.txt', value + '\n', (err) => {
+                                fs.appendFile('output3.txt', value + '\n', (err) => {
                                     if (err) {
                                         console.error('Error writing to file:', err);
                                     } else {

@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 let x=true;
 let y=true;
+let z=true;
 (async () => {
     const scriptContent = fs.readFileSync('tooltip.js', 'utf8');
     const browser = await puppeteer.launch({

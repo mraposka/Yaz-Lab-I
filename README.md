@@ -1,68 +1,80 @@
-FORMULA 1 TELEMETRİ VERİLERİ ANALİZİ
+# Formula 1 Telemetry Data Analysis
 
-Bu proje, Formula 1 yarışlarının geçmiş yıllara ait verilerini dinamik bir web arayüzünden otomatik olarak toplamak için tasarlanmıştır. Yalnızca Node.js kullanılarak, belirli bir yıl, pist, yarış ve sürücü kombinasyonuna göre verilere ulaşılmış ve detaylı analiz için işlenebilir formatta kaydedilmiştir.
+This project is designed to automatically collect historical Formula 1 race data from a dynamic web interface. Using **Node.js** as the sole backend technology, data for specific combinations of year, circuit, race, and driver are retrieved and saved in a processable format for detailed analysis.
 
-A.    Özellikler
+---
 
-Dinamik web arayüzünden veri toplama.
+## Features
 
-Yıl, pist, yarış ve sürücü bazında seçim yapma.
+- **Dynamic Web Scraping**: Collects data from an interactive web interface.
+- **Custom Selections**: Allows filtering by year, circuit, race, and driver.
+- **Graph Data Extraction**: Captures data by scanning the graph using mouse movements.
+- **Export Options**: Saves collected data in `.txt` format.
 
-Grafik üzerindeki verileri mouse hareketleriyle tarayarak yakalama.
+---
 
-Toplanan verileri .txt formatında dışa aktarma.
+## Technologies Used
 
+- **Node.js**: Core framework for browser control, dynamic selection, and data extraction.
+- **Puppeteer**: Handles browser automation and HTML element interaction.
+- **Custom Tooltip Handler (tooltip.js)**: A JavaScript module for extracting data from interactive graphs.
 
-B.    Kullanılan Teknolojiler
+---
 
-Node.js: Web tarayıcısını kontrol etmek, dinamik seçimler yapmak ve verileri toplamak için temel araç.
+## Workflow
 
-Puppeteer: Tarayıcı otomasyonu ve HTML elementlerinin yakalanması.
+### 1. **Selection Steps**
 
-Custom Tooltip Handler (tooltip.js): Grafik üzerindeki verileri yakalamak için özel bir JavaScript modülü.
+The user makes sequential selections for year, circuit, race, and driver. For instance, with the selection `Done for 4,1,2,16`:
 
+- **Year**: 4th index → 2020  
+- **Circuit**: 1st index  
+- **Race**: 2nd index  
+- **Driver**: 16th index  
 
-C.    Çalışma Prensibi
+### 2. **Capturing Graph Data**
 
-1.Seçim Aşamaları
+- Data is displayed only during mouse movements over the graph.
+- The mouse is programmatically moved from the leftmost to the rightmost position of the graph's `div` element, capturing data every 1 pixel.
+- To ensure no data is missed, a reverse movement of 0.5 pixels is performed at the far right.
 
-Kullanıcı belirtilen kombinasyona göre yıl, pist, yarış, ve pilot seçimlerini sırasıyla yapar. Örneğin, Done for 4,1,2,16 şeklinde bir seçimde:
+### 3. **Processing Tooltip Data**
 
-Yıl: 4. indeks → 2020
+- As the mouse moves, tooltip elements with the `custom-tooltip` class are generated dynamically.
+- The `tooltip.js` module extracts information from the `<p>` tags within these tooltips and logs the data to the console.
 
-Pist: 1. indeks
+### 4. **Saving Data via Node.js**
 
-Yarış: 2. indeks
+- Data logged to the browser console is captured using the `page.on('console')` event listener in Node.js.
+- This data is then written to a `.txt` file for further use.
 
-Pilot: 16. indeks
+### 5. **Parallel Processing for Efficiency**
 
-2.Grafik Verilerinin Yakalanması
+- Due to the time-consuming nature of data collection, multiple `indexX.js` files are created to scrape data from different starting points simultaneously.  
+  Examples:  
+  - `index6.js` → Begins collecting data from the 5th year.  
+  - `index5.js` → Begins collecting data from the 4th year.  
 
+---
 
-Grafik üzerinde veriler yalnızca mouse hareketi sırasında görüntülendiği için, otomatik olarak grafik div’inin solundan sağına doğru her 1 piksel ilerleme yapılarak veriler yakalanır.
+## How to Run
 
-İlerleme sırasında eksik veri kalmaması adına, en sağ noktadan 0.5 piksel sola geri hareket yapılır.
+1. Clone this repository.
+2. Install dependencies with `npm install`.
+3. Run individual index files for data collection:  
+   ```bash
+   node index.js
+   ```
+4. Collected data will be saved as `.txt` files in the output directory.
 
-3.Tooltip Verilerinin İşlenmesi
+---
 
+## Future Improvements
 
-Mouse hareket ettikçe grafik üzerindeki bilgiler, custom-tooltip sınıfına sahip HTML elementleri olarak oluşturulur.
+- Automating parallel processing for all year indices.
+- Adding support for exporting data in additional formats like `.csv` or `.json`.
+- Improving graph data extraction to handle non-linear movement scenarios.
 
-tooltip.js, bu elementlerin içindeki <p> etiketlerini seçerek verileri yakalar ve konsola yazdırır.
+--- 
 
-4.Node.js Üzerinden Verilerin Kaydedilmesi
-
-
-
-Tarayıcı konsolunda yazılan veriler, Node.js ile page.on('console') olay dinleyicisi aracılığıyla yakalanır ve bir .txt dosyasına kaydedilir.
-
-5.Çoklu İndeksleme ve Paralel İşleme
-
-
-
-Veri toplama işlemi uzun sürdüğü için, farklı indexX.js dosyaları oluşturularak farklı yıl indekslerinden başlanmıştır. Örneğin:
-
-index6.js → 5. yıldan başlayarak veri toplar.
-
-index5.js → 4. yıldan başlayarak veri toplar.
-
+Feel free to contribute or suggest new features! 😊

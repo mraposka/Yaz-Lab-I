@@ -77,7 +77,7 @@ namespace CSV
                     if ((line.Contains(" AM") || line.Contains(" PM")) && line.Split(':').Count() == 2)
                         continue;
                     if (line.Split(',').Count() == 3)
-                        line = line.Split(',')[1].Remove(0,1)+ "," + line.Split(',')[2];
+                        line = line.Split(',')[1].Remove(0, 1) + "," + line.Split(',')[2];
                     if (!line.Contains(" AM") && !line.Contains("PM") && !line.StartsWith("Done For"))//Satır Done For değilse ve AM PM gibi bişey içermiyorsa bozuktur atla 
                     {
                         if (!line.Contains(':'))

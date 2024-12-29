@@ -1,0 +1,7 @@
+C:\Users\Can\Desktop\CSV\CSV\bin\Debug\CSV.exe.config
+C:\Users\Can\Desktop\CSV\CSV\bin\Debug\CSV.exe
+C:\Users\Can\Desktop\CSV\CSV\bin\Debug\CSV.pdb
+C:\Users\Can\Desktop\CSV\CSV\obj\Debug\CSV.csproj.AssemblyReference.cache
+C:\Users\Can\Desktop\CSV\CSV\obj\Debug\CSV.csproj.CoreCompileInputs.cache
+C:\Users\Can\Desktop\CSV\CSV\obj\Debug\CSV.exe
+C:\Users\Can\Desktop\CSV\CSV\obj\Debug\CSV.pdb

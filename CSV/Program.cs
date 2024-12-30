@@ -102,7 +102,7 @@ namespace CSV
                         string year = years[indexs[0]];
                         string gp = gps[indexs[1]];
                         string session = sessions[indexs[2]];
-                        Console.WriteLine(lines[0]);
+                        //Console.WriteLine(lines[0]);
                         string driver = lines[0].Split(',')[1].Split(':')[0].Trim();
                         string fileName = year + "-" + gp + "-" + session + "-" + driver + ".csv";
                         File.AppendAllLines(outputDirectory + fileName, lines);
@@ -114,11 +114,46 @@ namespace CSV
                     count++;
                     if (line.Split(',').Count() > 2)
                         line = line.Substring(0, line.IndexOf(','));
+
                     lines.Add(line);
                 }
             }
 
             Console.WriteLine("CSV dosyaları başarıyla oluşturuldu.");
+            Console.WriteLine("Combine İşlemi Başladı!");
+            string[] csvFiles = Directory.GetFiles(@"C:\\Users\\Can\\Desktop\\Yaz-Lab-I-csv\\CSV\\bin\\Debug\\output", "*.csv"); // Get all CSV files
+
+            // Create a dictionary to hold data for each pilot
+            Dictionary<string, List<string>> pilots = new Dictionary<string, List<string>>();
+
+            foreach (var file in csvFiles)
+            {
+                // Extract the pilot identifier from the file name (assuming it follows a pattern like "x-file.csv")
+                string pilotIdentifier = file.Split('-').Last().Split('.').First();  // Adjust as needed based on filename pattern
+
+                // Read the file content
+                string fileContent = File.ReadAllText(file);
+
+                // If the pilot identifier already exists in the dictionary, add the data to the existing list
+                if (!pilots.ContainsKey(pilotIdentifier))
+                {
+                    pilots[pilotIdentifier] = new List<string>();  // Create a new list for the pilot if not already present
+                }
+
+                // Add the file content to the list of data for the respective pilot
+                pilots[pilotIdentifier].Add(fileContent);
+            }
+
+            foreach (var pilot in pilots)
+            {
+                Console.WriteLine(pilot.ToString());
+                foreach (var data in pilot.Value.Distinct())
+                {
+                    Console.WriteLine(data.ToString());
+                    File.AppendAllText($"output/combined/{pilot.Key}.csv", data);
+                }
+            }
+            Console.WriteLine("CSV'ler Combinelandı");
             Console.ReadKey();
         }
     }

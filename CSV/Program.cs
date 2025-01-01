@@ -12,6 +12,7 @@ namespace CSV
         {
             string inputFilePath = "data.txt"; // Girdi dosyası
             string outputDirectory = "output/"; // Çıktı dosyalarının saklanacağı klasör
+            /*
             Directory.CreateDirectory(outputDirectory);
 
             string[] gps = new string[]
@@ -118,43 +119,85 @@ namespace CSV
                     lines.Add(line);
                 }
             }
-
+            */
+            /*
             Console.WriteLine("CSV dosyaları başarıyla oluşturuldu.");
             Console.WriteLine("Combine İşlemi Başladı!");
-            string[] csvFiles = Directory.GetFiles(@"C:\\Users\\Can\\Desktop\\Yaz-Lab-I-csv\\CSV\\bin\\Debug\\output", "*.csv"); // Get all CSV files
+            string[] csvFiles = Directory.GetFiles(@"C:\Users\Can\Desktop\Yaz-Lab-I\CSV\bin\Debug\output", "*.csv"); // Get all CSV files
 
-            // Create a dictionary to hold data for each pilot
-            Dictionary<string, List<string>> pilots = new Dictionary<string, List<string>>();
+            // Create a dictionary to hold data for each piste-pilot combination
+            Dictionary<string, List<string>> pistePilotData = new Dictionary<string, List<string>>();
 
             foreach (var file in csvFiles)
             {
-                // Extract the pilot identifier from the file name (assuming it follows a pattern like "x-file.csv")
-                string pilotIdentifier = file.Split('-').Last().Split('.').First();  // Adjust as needed based on filename pattern
+                // Extract piste and pilot identifiers from the file name
+                string[] fileParts = file.Split('\\').Last().Split('-');
+                string piste = fileParts[1]; // Piste (e.g., "Miami GP")
+                string pilot = fileParts[3].Split('.').First(); // Pilot code (e.g., "STR")
+
+                // Combine piste and pilot into a unique key
+                string pistePilotKey = $"{piste}-{pilot}";
 
                 // Read the file content
                 string fileContent = File.ReadAllText(file);
 
-                // If the pilot identifier already exists in the dictionary, add the data to the existing list
-                if (!pilots.ContainsKey(pilotIdentifier))
+                // If the piste-pilot combination already exists, add the data to the existing list
+                if (!pistePilotData.ContainsKey(pistePilotKey))
                 {
-                    pilots[pilotIdentifier] = new List<string>();  // Create a new list for the pilot if not already present
+                    pistePilotData[pistePilotKey] = new List<string>(); // Create a new list for this combination if not already present
                 }
 
-                // Add the file content to the list of data for the respective pilot
-                pilots[pilotIdentifier].Add(fileContent);
+                // Add the file content to the list of data for the respective piste-pilot combination
+                pistePilotData[pistePilotKey].Add(fileContent);
             }
 
-            foreach (var pilot in pilots)
+            // For each piste-pilot combination, write the distinct content to respective output files
+            foreach (var entry in pistePilotData)
             {
-                Console.WriteLine(pilot.ToString());
-                foreach (var data in pilot.Value.Distinct())
+                string outputFileName = $"output/combined/{entry.Key}.csv";
+                Console.WriteLine($"Creating file: {outputFileName}");
+
+                foreach (var data in entry.Value.Distinct())
                 {
-                    Console.WriteLine(data.ToString());
-                    File.AppendAllText($"output/combined/{pilot.Key}.csv", data);
+                    // Write distinct data to the corresponding CSV file
+                    File.AppendAllText(outputFileName, data + Environment.NewLine); // Add newline after each data entry
                 }
             }
-            Console.WriteLine("CSV'ler Combinelandı");
+
+            Console.WriteLine("CSV'ler pist-pilot kombinasyonlarına göre birleştirildi.");
+            */
+            Clean();
             Console.ReadKey();
+
+
+
+        }
+
+        public static void Clean()
+        {
+            string inputDirectory = @"C:\Users\Can\Desktop\Yaz-Lab-I\CSV\bin\Debug\output\combined";
+
+            foreach (var file in Directory.GetFiles(inputDirectory, "*.csv"))
+            {
+                Console.WriteLine($"Processing file: {file}");
+
+                // Read all lines from the file
+                var lines = File.ReadAllLines(file);
+
+                // Remove duplicates and empty lines
+                var cleanedLines = lines
+                    .Select(line => line.Trim()) // Trim whitespace
+                    .Where(line => !string.IsNullOrWhiteSpace(line)) // Remove empty lines
+                    .Distinct() // Remove duplicate lines
+                    .ToList();
+
+                // Overwrite the same file with cleaned content
+                File.WriteAllLines(file, cleanedLines);
+
+                Console.WriteLine($"Cleaned file: {file}");
+            }
+
+            Console.WriteLine("All files cleaned.");
         }
     }
 }

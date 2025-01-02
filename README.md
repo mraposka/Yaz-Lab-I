@@ -1,80 +1,124 @@
-# Formula 1 Telemetry Data Analysis
+---
 
-This project is designed to automatically collect historical Formula 1 race data from a dynamic web interface. Using **Node.js** as the sole backend technology, data for specific combinations of year, circuit, race, and driver are retrieved and saved in a processable format for detailed analysis.
+### Proje Açıklaması:
+
+Bu proje, `.csv` dosyalarındaki zaman serilerini işleyip, bu verilerle bir yapay zeka modelini eğitip, tahminler yapmanızı sağlar. Ayrıca, verileri temizleyip birleştirir, ardından tahminlerde bulunur.
 
 ---
 
-## Features
+### 1. **Gereksinimler**:
 
-- **Dynamic Web Scraping**: Collects data from an interactive web interface.
-- **Custom Selections**: Allows filtering by year, circuit, race, and driver.
-- **Graph Data Extraction**: Captures data by scanning the graph using mouse movements.
-- **Export Options**: Saves collected data in `.txt` format.
+Projenin çalışabilmesi için aşağıdaki Python paketlerinin yüklü olması gerekmektedir:
 
----
+- **numpy**: Matematiksel hesaplamalar için.
+- **torch**: PyTorch, makine öğrenmesi için kullanılır.
+- **matplotlib**: Grafik çizimleri için.
+- **sklearn**: Veriyi normalleştirmek için kullanılır.
 
-## Technologies Used
+Yüklemek için terminalde şu komutları çalıştırabilirsiniz:
 
-- **Node.js**: Core framework for browser control, dynamic selection, and data extraction.
-- **Puppeteer**: Handles browser automation and HTML element interaction.
-- **Custom Tooltip Handler (tooltip.js)**: A JavaScript module for extracting data from interactive graphs.
-
----
-
-## Workflow
-
-### 1. **Selection Steps**
-
-The user makes sequential selections for year, circuit, race, and driver. For instance, with the selection `Done for 4,1,2,16`:
-
-- **Year**: 4th index → 2020  
-- **Circuit**: 1st index  
-- **Race**: 2nd index  
-- **Driver**: 16th index  
-
-### 2. **Capturing Graph Data**
-
-- Data is displayed only during mouse movements over the graph.
-- The mouse is programmatically moved from the leftmost to the rightmost position of the graph's `div` element, capturing data every 1 pixel.
-- To ensure no data is missed, a reverse movement of 0.5 pixels is performed at the far right.
-
-### 3. **Processing Tooltip Data**
-
-- As the mouse moves, tooltip elements with the `custom-tooltip` class are generated dynamically.
-- The `tooltip.js` module extracts information from the `<p>` tags within these tooltips and logs the data to the console.
-
-### 4. **Saving Data via Node.js**
-
-- Data logged to the browser console is captured using the `page.on('console')` event listener in Node.js.
-- This data is then written to a `.txt` file for further use.
-
-### 5. **Parallel Processing for Efficiency**
-
-- Due to the time-consuming nature of data collection, multiple `indexX.js` files are created to scrape data from different starting points simultaneously.  
-  Examples:  
-  - `index6.js` → Begins collecting data from the 5th year.  
-  - `index5.js` → Begins collecting data from the 4th year.  
+```bash
+pip install numpy torch matplotlib scikit-learn
+```
 
 ---
 
-## How to Run
+### 2. **Dosya Yapısı**:
 
-1. Clone this repository.
-2. Install dependencies with `npm install`.
-3. Run individual index files for data collection:  
-   ```bash
-   node index.js
-   ```
-4. Collected data will be saved as `.txt` files in the output directory.
+Projenin temel dosya yapısı şu şekilde olmalıdır:
+
+```
+(project/) 
+├── clean.py
+├── data.txt
+├── output/
+│ ├── combined/
+│ │ ├── main.py
+│ │ ├── f1a-clean.csv # Processed CSV files 
+│ │ ├── f1b-clean.csv # Processed CSV files 
+│ ├── f1a.csv # Processed CSV files 
+└── f1b.csv # Processed CSV files 
+
+```
+
+- **data.txt**: Analiz edilecek ham veri dosyası.
+- **clean.py**: Veriyi temizleme ve birleştirme işlemlerini yapan Python dosyası.
+- **main.py**: Modelin eğitimini ve tahmin işlemlerini yapan Python dosyası.
+- **output/combined/**: İşlenmiş ve birleştirilmiş CSV dosyalarını içeren klasör.
 
 ---
 
-## Future Improvements
+### 3. **Veri Temizleme ve Birleştirme (clean.py)**:
 
-- Automating parallel processing for all year indices.
-- Adding support for exporting data in additional formats like `.csv` or `.json`.
-- Improving graph data extraction to handle non-linear movement scenarios.
+Veriyi temizleme ve birleştirme işlemini `clean.py` dosyası yapar.
 
---- 
+- **Veri Okuma**: `data.txt` dosyasındaki veriler okunur.
+- **Veri Temizleme**: Gereksiz boşluklar, tarih ve saat formatları düzeltilir.
+- **CSV Dosyası Oluşturma**: Temizlenen veriler her bir sürücü için ayrı CSV dosyalarına yazılır.
+- **CSV Birleştirme**: Oluşan CSV dosyaları birleştirilir.
 
-Feel free to contribute or suggest new features! 😊
+**Kullanım:**
+
+1. `data.txt` dosyanızı hazırlayın (zaman verilerini içeren dosya).
+2. `clean.py` dosyasını çalıştırın:
+
+```bash
+python clean.py
+```
+
+Bu işlem, verilerinizi temizler ve her bir sürücü için ayrı CSV dosyaları oluşturur. Bu dosyalar `output/combined/` klasörüne kaydedilecektir.
+
+---
+
+### 4. **Model Eğitimi ve Tahmin (main.py)**:
+
+`main.py`, CSV dosyalarındaki verileri okuyarak bir zaman serisi tahmini yapmak için bir yapay zeka modeli kullanır.
+
+- **Veri Okuma**: Her bir CSV dosyasındaki zaman verilerini okur.
+- **Özellik Çıkartma**: Zaman serisi verilerini alır, normalleştirir ve model için uygun formata dönüştürür.
+- **Model Eğitimi**: Yapay zeka modeli eğitilir.
+- **Tahmin**: Eğitilen model ile tahminler yapılır.
+
+**Kullanım:**
+
+1. `output/combined/` klasöründe `.csv` dosyalarının bulunduğundan emin olun.
+2. `main.py` dosyasını çalıştırın:
+
+```bash
+python main.py
+```
+
+Bu işlem, tüm CSV dosyalarını okur ve her biri için zaman serisi tahminleri yapar. Sonuçlar ekranda gösterilecektir ve ayrıca her bir veri için MSE (Mean Squared Error), MAE (Mean Absolute Error) gibi istatistiksel sonuçlar da hesaplanır.
+
+---
+
+### 5. **Sonuçlar ve Grafikler**:
+
+Model eğitildikten sonra şu bilgiler ekranda gösterilecektir:
+
+- **MSE** (Mean Squared Error)
+- **MAE** (Mean Absolute Error)
+- **RMSE** (Root Mean Squared Error)
+- **MAPE** (Mean Absolute Percentage Error)
+- **R-Squared**
+
+Ayrıca, gerçek veriler ve tahminler arasındaki farkları görselleştiren grafikler de çizilecektir.
+
+---
+
+### 6. **Hızlı Başlangıç Örneği**:
+
+1. Verilerinizi **data.txt** dosyasına ekleyin.
+2. Temizleme ve CSV oluşturma işlemini başlatın:
+
+```bash
+python clean.py
+```
+
+3. Ardından **main.py** dosyasını çalıştırarak tahminleri elde edin:
+
+```bash
+python output/combined/main.py
+```
+
+---
